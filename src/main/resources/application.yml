@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    active: dev
+
+password:
+  salt: geelysdafaqj23ou89ZXcj@#$@#$#@KJdjklj;D../dSF.,
