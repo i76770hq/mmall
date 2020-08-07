@@ -122,6 +122,9 @@ public class CartServiceImpl implements ICartService {
 
         for (Cart cart : cartList) {
             Product product = productMap.get(cart.getProductId());
+            if (product == null) {
+                continue;
+            }
             CartProductVo cartProductVo = new CartProductVo();
             BeanUtils.copyProperties(cart, cartProductVo);
             cartProductVo.setProductName(product.getName());
