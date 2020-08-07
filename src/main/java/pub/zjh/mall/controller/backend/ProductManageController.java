@@ -168,7 +168,7 @@ public class ProductManageController {
                                  HttpServletResponse response) throws IOException {
         userService.checkAdminRole(user);
         String realUploadPath = servletContext.getRealPath(MallConst.IMAGE_UPLOAD_LOCAL_PATH);
-        String fileName = fileService.uploadFTP(multipartFile, realUploadPath, MallConst.IMAGE_UPLOAD_LOCAL_PATH);
+        String fileName = fileService.uploadFTP(multipartFile, realUploadPath, MallConst.IMAGE_UPLOAD_LOCAL_PATH.replace(File.separator, "/"));
         String prefix = ftpConfig.getPrefix();
         String url = prefix + MallConst.IMAGE_UPLOAD_LOCAL_PATH.replace(File.separator, "/") + "/" + fileName;
         //富文本中对于返回值有自己的要求,我们使用是simditor所以按照simditor的要求进行返回
