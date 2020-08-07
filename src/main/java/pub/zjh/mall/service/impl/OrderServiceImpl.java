@@ -221,7 +221,10 @@ public class OrderServiceImpl implements IOrderService {
         PageHelper.startPage(pageNum, pageSize);
         List<Order> orderList = orderMapper.selectAll();
         //组装OrderVoList
-        List<OrderVo> orderVoList = assembleOrderVoList(orderList);
+        List<OrderVo> orderVoList = Lists.newArrayList();
+        if (!CollectionUtils.isEmpty(orderList)) {
+            orderVoList = assembleOrderVoList(orderList);
+        }
         PageInfo pageInfo = new PageInfo(orderList);
         pageInfo.setList(orderVoList);
         return ResponseVo.success(pageInfo);
