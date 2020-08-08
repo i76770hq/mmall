@@ -5,7 +5,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: zhang51260
-    url: jdbc:mysql://192.168.3.114:3306/myBusiness?characterEncoding=utf-8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://192.168.3.116:3306/myBusiness?characterEncoding=utf-8&useSSL=false&serverTimezone=UTC
   servlet:
     multipart:
       max-file-size: 10MB
@@ -19,7 +19,7 @@ mybatis:
   mapper-locations: classpath:mappers/*.xml
 
 ftp:
-  ip: 192.168.3.114
+  ip: 192.168.3.116
   port: 21
   prefix: http://img.zjh.pub/
   user: ftpuser
@@ -27,3 +27,22 @@ ftp:
 
 alipay:
   callback_url: http://zjh-mall.natapp1.cc/order/alipay_callback.do
+
+#redis config
+redis:
+  ip: 192.168.3.116
+  port: 6379
+  timeout: 2000
+  #最大连接数
+  maxTotal: 20
+  #最大空闲数
+  maxIdle: 10
+  #最小空闲数
+  minIdle: 2
+  #从jedis连接池获取连接时，校验并返回可用的连接
+  testOnBorrow: true
+  #把连接放回jedis连接池时，校验并返回可用的连接
+  testOnReturn: true
+  #连接耗尽的时候,是否阻塞,false会抛出异常,true阻塞直到超时,默认为true
+  blockWhenExhausted: true
+
