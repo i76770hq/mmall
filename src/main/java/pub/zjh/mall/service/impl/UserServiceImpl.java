@@ -12,7 +12,7 @@ import pub.zjh.mall.exception.MallException;
 import pub.zjh.mall.form.UpdateUserForm;
 import pub.zjh.mall.pojo.User;
 import pub.zjh.mall.service.IUserService;
-import pub.zjh.mall.util.TokenCache;
+import pub.zjh.mall.util.RedisPoolUtil;
 import pub.zjh.mall.vo.ResponseVo;
 
 import java.util.UUID;
@@ -25,6 +25,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private MD5Config md5Config;
+
+    @Autowired
+    private RedisPoolUtil redisPoolUtil;
 
     @Override
     public ResponseVo<User> login(String username, String password) {
@@ -103,13 +106,13 @@ public class UserServiceImpl implements IUserService {
             throw new MallException(ResponseEnum.QUESTION_ANSWER_ERROR.getDesc());
         }
         String forgetToken = UUID.randomUUID().toString();
-        TokenCache.setKey(TokenCache.TOKEN_PREFIX + username, forgetToken);
+        redisPoolUtil.setEx(MallConst.TOKEN_PREFIX + username, forgetToken, MallConst.TOKEN_EXPIRE);
         return ResponseVo.success(forgetToken);
     }
 
     @Override
     public ResponseVo forgetRestPassword(String username, String passwordNew, String forgetToken) {
-        String token = TokenCache.getKey(TokenCache.TOKEN_PREFIX + username);
+        String token = redisPoolUtil.get(MallConst.TOKEN_PREFIX + username);
 
         if (forgetToken.equals(token)) {
             String newMd5Password = md5Config.md5EncodeAddSalt(passwordNew);

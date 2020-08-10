@@ -26,8 +26,12 @@ public class MallConst {
     public static final String LIMIT_NUM_FAIL = "LIMIT_NUM_FAIL";
     public static final String LIMIT_NUM_SUCCESS = "LIMIT_NUM_SUCCESS";
 
-
+    //Redis
     //Redis Session过期时间
     public static final Integer REDIS_SESSION_EXPIRE = 30 * 60;
+    //忘记密码的生成token前缀
+    public static final String TOKEN_PREFIX = "token_";
+    //忘记密码的生成token过期时间
+    public static final Integer TOKEN_EXPIRE = 12 * 60 * 60;
 
 }
