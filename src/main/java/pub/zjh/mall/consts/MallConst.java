@@ -26,4 +26,8 @@ public class MallConst {
     public static final String LIMIT_NUM_FAIL = "LIMIT_NUM_FAIL";
     public static final String LIMIT_NUM_SUCCESS = "LIMIT_NUM_SUCCESS";
 
+
+    //Redis Session过期时间
+    public static final Integer REDIS_SESSION_EXPIRE = 30 * 60;
+
 }

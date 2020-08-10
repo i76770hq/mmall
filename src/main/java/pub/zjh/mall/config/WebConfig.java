@@ -18,4 +18,13 @@ public class WebConfig implements WebMvcConfigurer {
         argumentResolvers.add(userArgumentResolver);
     }
 
+//    @Bean
+//    public FilterRegistrationBean filterRegistrationBean(SessionExpireFilter sessionExpireFilter) {
+//        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+//        filterRegistrationBean.setFilter(sessionExpireFilter);
+//        filterRegistrationBean.setName("sessionExpireFilter");
+//        filterRegistrationBean.setUrlPatterns(Lists.newArrayList("*.do"));
+//        return filterRegistrationBean;
+//    }
+
 }

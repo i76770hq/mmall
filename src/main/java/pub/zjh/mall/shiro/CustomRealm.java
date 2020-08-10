@@ -27,7 +27,6 @@ public class CustomRealm extends AuthorizingRealm {
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
-        System.out.println("————身份认证方法————");
         UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
         // 从数据库获取对应用户名密码的用户
         String username = token.getUsername();
@@ -49,7 +48,6 @@ public class CustomRealm extends AuthorizingRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-        System.out.println("————权限认证————");
         String username = (String) principalCollection.getPrimaryPrincipal();
         //获得该用户角色
         int role = userMapper.selectRoleByUsername(username);

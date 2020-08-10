@@ -1,31 +1,31 @@
 package pub.zjh.mall.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pub.zjh.mall.dao.UserMapper;
 import pub.zjh.mall.shiro.CredentialMatcher;
 import pub.zjh.mall.shiro.CustomRealm;
+import pub.zjh.mall.shiro.RedisCacheManager;
+import pub.zjh.mall.shiro.RedisSessionDao;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Created with IntelliJ IDEA
- *
- * @Author yuanhaoyue swithaoy@gmail.com
- * @Description shiro 配置
- * @Date 2018-03-28
- * @Time 17:21
- */
 @Configuration
+@Slf4j
 public class ShiroConfig {
     /**
+     * 创建ShiroFilter,负责拦截所有请求
+     * <p>
      * 过滤器默认权限表 {anon=anon, authc=authc, authcBasic=authcBasic, logout=logout,
      * noSessionCreation=noSessionCreation, perms=perms, port=port,
      * rest=rest, roles=roles, ssl=ssl, user=user}
@@ -49,7 +49,7 @@ public class ShiroConfig {
         // 设置无权限时跳转的 url;
         shiroFilterFactoryBean.setUnauthorizedUrl("/notRole");
 
-        // 设置拦截器
+        // 设置拦截器,配置系统受限资源和公共资源
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
         //开放用户登陆、登出接口
         filterChainDefinitionMap.put("/user/**", "anon");
@@ -67,23 +67,44 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/**", "authc");
 
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
-        System.out.println("Shiro拦截器工厂类注入成功");
+        log.info("Shiro拦截器工厂类注入成功");
         return shiroFilterFactoryBean;
     }
 
     /**
-     * 注入 securityManager
+     * 创建安全管理器securityManager
      */
     @Bean
-    public SecurityManager securityManager(CustomRealm customRealm) {
+    public DefaultWebSecurityManager securityManager(CustomRealm customRealm,
+                                                     SessionManager sessionManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         // 设置realm.
         securityManager.setRealm(customRealm);
+        securityManager.setSessionManager(sessionManager);
         return securityManager;
     }
 
     @Bean
-    public CustomRealm customRealm(UserMapper userMapper, CredentialMatcher credentialMatcher) {
+    public SessionManager sessionManager(RedisSessionDao redisSessionDao) {
+        DefaultWebSessionManager defaultWebSessionManager = new DefaultWebSessionManager();
+        defaultWebSessionManager.setSessionDAO(redisSessionDao);
+        //修改Cookie中的SessionId的key，默认为JSESSIONID，自定义名称
+//        defaultWebSessionManager.setSessionIdCookie(new SimpleCookie("JSESSIONID"));
+        return defaultWebSessionManager;
+    }
+
+
+    /**
+     * 创建自定义realm
+     *
+     * @param userMapper
+     * @param credentialMatcher
+     * @return
+     */
+    @Bean
+    public CustomRealm customRealm(UserMapper userMapper,
+                                   CredentialMatcher credentialMatcher,
+                                   RedisCacheManager redisCacheManager) {
         CustomRealm customRealm = new CustomRealm();
         customRealm.setUserMapper(userMapper);
 
@@ -91,7 +112,16 @@ public class ShiroConfig {
 //        hashedCredentialsMatcher.setHashAlgorithmName("md5");
 //        hashedCredentialsMatcher.setHashIterations(1);
 //        customRealm.setCredentialsMatcher(hashedCredentialsMatcher);
+        //设置凭证校验匹配器
         customRealm.setCredentialsMatcher(credentialMatcher);
+
+        //开启缓存管理器
+        customRealm.setCacheManager(redisCacheManager);
+        customRealm.setCachingEnabled(true);
+        customRealm.setAuthenticationCachingEnabled(true);
+        customRealm.setAuthenticationCacheName("authenticationCache");
+        customRealm.setAuthorizationCachingEnabled(true);
+        customRealm.setAuthorizationCacheName("authorizationCache");
         return customRealm;
     }
 
